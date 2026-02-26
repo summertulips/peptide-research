@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peptide Product Catalogue</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface-hover: #161616;
+    --border: #1e1e1e;
+    --border-accent: #2a2a2a;
+    --text: #e8e8e8;
+    --text-muted: #888888;
+    --text-dim: #555555;
+    --accent: #c8f540;
+    --accent-dim: rgba(200, 245, 64, 0.08);
+    --accent-glow: rgba(200, 245, 64, 0.15);
+    --blue: #5b9cf5;
+    --teal: #4fd1c5;
+    --amber: #f5c842;
+    --rose: #f07070;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page-header {
+    padding: 80px 60px 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -100px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .page-header .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .page-header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text);
+    max-width: 700px;
+  }
+
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .page-header .subtitle {
+    margin-top: 24px;
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.8;
+  }
+
+  .catalogue {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 60px 120px;
+  }
+
+  .product-card {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: var(--surface);
+  }
+
+  .product-card:hover {
+    border-color: var(--border-accent);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 40px 44px 0;
+  }
+
+  .card-top .product-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .card-top .category-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--border-accent);
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 20px;
+    margin-top: 6px;
+  }
+
+  .card-tagline {
+    padding: 8px 44px 0;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--text-muted);
+  }
+
+  .card-body {
+    padding: 24px 44px 36px;
+  }
+
+  .card-description {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.85;
+    max-width: 780px;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--accent-dim);
+    color: var(--text-muted);
+  }
+
+  .meta-pill .label {
+    color: var(--text-dim);
+  }
+
+  .meta-pill .value {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .card-benefits {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+  }
+
+  .benefit-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-green { background: var(--accent); }
+  .dot-blue { background: var(--blue); }
+  .dot-teal { background: var(--teal); }
+  .dot-amber { background: var(--amber); }
+  .dot-rose { background: var(--rose); }
+
+  .disclaimer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: 14px 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    letter-spacing: 0.5px;
+    z-index: 100;
+  }
+
+  @media (max-width: 768px) {
+    .page-header { padding: 50px 24px 40px; }
+    .catalogue { padding: 24px 16px 120px; }
+    .card-top { padding: 28px 24px 0; flex-direction: column; gap: 12px; }
+    .card-top .category-tag { margin-left: 0; }
+    .card-tagline { padding: 8px 24px 0; }
+    .card-body { padding: 20px 24px 28px; }
+    .card-benefits { grid-template-columns: 1fr; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .product-card {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .product-card:nth-child(1) { animation-delay: 0.05s; }
+  .product-card:nth-child(2) { animation-delay: 0.1s; }
+  .product-card:nth-child(3) { animation-delay: 0.15s; }
+  .product-card:nth-child(4) { animation-delay: 0.2s; }
+  .product-card:nth-child(5) { animation-delay: 0.25s; }
+  .product-card:nth-child(6) { animation-delay: 0.3s; }
+  .product-card:nth-child(7) { animation-delay: 0.35s; }
+  .product-card:nth-child(8) { animation-delay: 0.4s; }
+  .product-card:nth-child(9) { animation-delay: 0.45s; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="eyebrow">Research Peptide Catalogue</div>
+  <h1>Precision peptides for the <em>modern era</em></h1>
+  <p class="subtitle">Pharmaceutical-grade compounds, third-party tested for purity and potency. Each product ships lyophilised with full certificates of analysis.</p>
+</div>
+
+<div class="catalogue">
+
+  <!-- RETATRUTIDE -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">Retatrutide</div>
+      <div class="category-tag">Triple Agonist</div>
+    </div>
+    <div class="card-tagline">The weight loss compound that targets all three pathways</div>
+    <div class="card-body">
+      <p class="card-description">
+        You've probably heard of Ozempic and Mounjaro — they work by targeting one or two appetite hormones to help your body manage weight. Retatrutide takes that a step further. It's the first compound to hit all three metabolic pathways at once: GLP-1 (the one that makes you feel full), GIP (which helps your body process sugar), and glucagon (which actually tells your body to burn stored fat for energy). In early clinical trials by Eli Lilly, people on the highest dose lost an average of 24.2% of their body weight in under a year — that's roughly 19kg if you weigh 80kg. It's a once-weekly injection, and because it activates that third fat-burning pathway that other weight loss compounds miss entirely, researchers believe it could represent a genuine leap forward in metabolic science.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">Sequence</span><span class="value">39 Amino Acids</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">-20°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>Tri-receptor agonist (GLP-1/GIP/Glucagon)</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Significant metabolic impact in trials</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Enhanced lipid metabolism pathway</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Once-weekly administration</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GHK-Cu -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">GHK-Cu</div>
+      <div class="category-tag">Copper Peptide</div>
+    </div>
+    <div class="card-tagline">Your body's own anti-ageing signal — restored</div>
+    <div class="card-body">
+      <p class="card-description">
+        GHK-Cu is a tiny copper-bonded peptide that your body already makes naturally — it's found in your blood, saliva, and skin. Think of it as your body's built-in repair signal. It tells your skin cells to produce more collagen and elastin (the proteins that keep skin firm and bouncy), helps form new blood vessels to deliver nutrients to damaged tissue, and ramps up your natural antioxidant defences. Here's the kicker: when you're 20, your GHK-Cu levels are at their peak. By 60, they've dropped by more than half — and that decline maps almost perfectly onto the visible signs of ageing. Even more impressive, research has shown GHK-Cu can influence the activity of over 4,000 genes, effectively resetting many of them to behave the way they did when you were younger. It's one of the most studied anti-ageing peptides in existence.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">MW</span><span class="value">403.93 g/mol</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">2–8°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>Collagen & elastin synthesis</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Tissue remodelling & wound repair</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Gene expression modulation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Antioxidant enzyme activation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOTS-c -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">MOTS-c</div>
+      <div class="category-tag">Mitochondrial Peptide</div>
+    </div>
+    <div class="card-tagline">Exercise in a peptide — your cells can't tell the difference</div>
+    <div class="card-body">
+      <p class="card-description">
+        MOTS-c is one of the most exciting peptides in longevity research right now — and for good reason. It's made by your mitochondria (the tiny power plants inside every cell that turn food into energy) and it essentially mimics what exercise does to your body at a cellular level. When you work out, your cells get better at burning sugar and fat for fuel. MOTS-c triggers those same metabolic pathways without the treadmill. It activates something called AMPK — your body's master energy sensor — which improves how your muscles absorb glucose, how efficiently you burn fat, and how well your cells handle stress. In animal studies, it's been shown to prevent weight gain on high-fat diets, improve physical performance, and boost insulin sensitivity. Discovered only in 2015, it's still early days — but researchers are calling it one of the most promising metabolic peptides ever identified.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">Sequence</span><span class="value">16 Amino Acids</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">-20°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>AMPK pathway activation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Insulin-independent glucose uptake</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Mitochondrial-nuclear crosstalk</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Metabolic stress resistance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAD+ -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">NAD+</div>
+      <div class="category-tag">Coenzyme</div>
+    </div>
+    <div class="card-tagline">The molecule your cells run on — and run out of</div>
+    <div class="card-body">
+      <p class="card-description">
+        NAD+ is a molecule that exists in every single cell in your body, and it's involved in literally hundreds of critical processes — from converting food into energy, to repairing damaged DNA, to regulating your sleep-wake cycle. It's also the fuel that powers two of the most important enzyme families in ageing research: sirtuins (often called "longevity genes") and PARPs (your DNA repair crew). The problem? Your NAD+ levels drop by roughly 50% between age 40 and 60. As they fall, your cells get worse at producing energy, slower at repairing themselves, and more vulnerable to age-related decline. You may have seen NMN or NR supplements — those are NAD+ precursors, meaning your body has to convert them through several steps before they become usable NAD+. Direct NAD+ supplementation skips those conversion steps entirely, delivering the finished molecule your cells actually need.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;99%</span></div>
+        <div class="meta-pill"><span class="label">MW</span><span class="value">663.43 g/mol</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">-20°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>Sirtuin & PARP enzyme activation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>DNA repair & cellular resilience</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Mitochondrial biogenesis</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Circadian rhythm regulation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BPC-157 -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">BPC-157</div>
+      <div class="category-tag">Body Protection Compound</div>
+    </div>
+    <div class="card-tagline">Born in your gut, built to heal everything else</div>
+    <div class="card-body">
+      <p class="card-description">
+        BPC-157 is probably the most talked-about recovery peptide in the world right now — and it comes from an unlikely source: your own stomach. It's derived from a protective protein found naturally in gastric juice, which is partly why it's so good at healing the gut. But the research goes way beyond digestion. Over three decades of studies have shown BPC-157 can accelerate the healing of tendons, ligaments, muscles, and even bone. It works by promoting the growth of new blood vessels to injured areas (so more oxygen and nutrients reach the damage), switching on growth factor receptors that speed up tissue repair, and modulating your body's nitric oxide system. What makes BPC-157 particularly interesting is its stability — most peptides break down in stomach acid, but BPC-157 is naturally resistant to it, which is rare and makes it one of the most versatile compounds in regenerative research.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">Sequence</span><span class="value">15 Amino Acids</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">2–8°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>Tendon, ligament & muscle repair</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Angiogenesis promotion</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Gastroprotective properties</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Gastric juice stable</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TB-500 -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">TB-500</div>
+      <div class="category-tag">Thymosin Beta-4 Fragment</div>
+    </div>
+    <div class="card-tagline">Sends your repair cells exactly where they're needed</div>
+    <div class="card-body">
+      <p class="card-description">
+        TB-500 is a synthetic version of a protein your body already produces called Thymosin Beta-4 — it's found in nearly every tissue and cell type you have. Its superpower is controlling something called actin, one of the most important building-block proteins in your body. Actin is what allows cells to move, divide, and rebuild — and TB-500 supercharges that process. When you have an injury, your body needs to get repair cells to the damage site as quickly as possible. TB-500 accelerates that cellular migration, helping your body patch up muscles, tendons, ligaments, and even skin faster. It also dials down inflammation by reducing the chemical signals that cause swelling and pain. What makes TB-500 stand out from other recovery peptides is that it works systemically — meaning it travels through your bloodstream and can reach injuries anywhere in the body, not just where it's applied. Researchers often study it alongside BPC-157, as the two appear to complement each other's mechanisms.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">MW</span><span class="value">4,963 Da</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">-20°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>Actin regulation & cell migration</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Systemic bioavailability</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Anti-inflammatory cytokine modulation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Multi-tissue repair capability</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ipamorelin -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">Ipamorelin</div>
+      <div class="category-tag">GH Secretagogue</div>
+    </div>
+    <div class="card-tagline">More growth hormone, minus the side effects</div>
+    <div class="card-body">
+      <p class="card-description">
+        Your body naturally releases growth hormone (GH) in pulses throughout the day — it's what helps you build lean muscle, burn fat, recover from workouts, and maintain healthy skin, hair, and joints. But GH production declines steadily from your late 20s onwards. Ipamorelin works by gently nudging your pituitary gland to release more of your own growth hormone, mimicking those natural pulses rather than flooding your system with synthetic HGH. What makes it special compared to older growth hormone peptides is its precision. Earlier compounds like GHRP-6 would boost GH but also spike cortisol (your stress hormone), increase appetite, and raise prolactin — creating a cascade of unwanted side effects. Ipamorelin triggers GH release and almost nothing else. It's the cleanest, most selective secretagogue in the research literature, which is why it's become one of the most widely studied peptides for age-related GH decline, body composition, and recovery.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">Sequence</span><span class="value">5 Amino Acids</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">2–8°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>Selective GH release (no cortisol spike)</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Natural pulsatile pattern</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Dose-dependent response curve</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Minimal off-target hormone effects</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Melanotan -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">Melanotan II</div>
+      <div class="category-tag">Melanocortin Agonist</div>
+    </div>
+    <div class="card-tagline">A deeper tan, engineered from the inside out</div>
+    <div class="card-body">
+      <p class="card-description">
+        Melanotan II was originally developed at the University of Arizona in the 1990s as a potential way to protect fair-skinned people from UV damage and skin cancer. It works by activating the same receptors that your body uses when it tans naturally — specifically, it tells your skin cells to produce more melanin, the dark pigment that acts as your body's natural sunscreen. The difference is that Melanotan II activates this process far more efficiently than UV exposure alone, meaning the skin's protective pigment increases without requiring extended sun exposure. Beyond tanning research, scientists have also studied Melanotan II's effects on appetite regulation and energy balance, since the melanocortin receptors it targets play roles across multiple body systems. Its cyclic (ring-shaped) molecular structure makes it unusually stable compared to similar peptides, meaning it stays active in the body for longer before being broken down.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">MW</span><span class="value">1,024.18 g/mol</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">-20°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>MC1R–MC5R receptor activation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Eumelanin synthesis upregulation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Enhanced metabolic stability</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>Appetite & energy homeostasis research</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Semax -->
+  <div class="product-card">
+    <div class="card-top">
+      <div class="product-name">Semax</div>
+      <div class="category-tag">Nootropic Peptide</div>
+    </div>
+    <div class="card-tagline">Sharper focus, better memory — no stimulants required</div>
+    <div class="card-body">
+      <p class="card-description">
+        Semax is a brain-boosting peptide that's been used clinically in Russia for over 30 years — it's actually an approved medication there for cognitive enhancement and stroke recovery. It was developed from a fragment of ACTH, a hormone your brain naturally produces, but engineered to deliver only the cognitive benefits without any of the stress-hormone side effects that ACTH normally triggers. What does it actually do? It increases your brain's production of BDNF and NGF — two proteins that are essentially fertiliser for your neurons. BDNF strengthens existing brain connections and helps form new ones (this is what happens when you learn something), while NGF protects nerve cells from damage and supports their growth. Semax also fine-tunes your dopamine and serotonin systems, the neurotransmitters responsible for focus, motivation, and mood. People in the nootropics community often describe it as a "clean" focus enhancer — sharper attention and better memory formation without the jittery, wired feeling you get from stimulants.
+      </p>
+      <div class="card-meta">
+        <div class="meta-pill"><span class="label">Form</span><span class="value">Lyophilised Powder</span></div>
+        <div class="meta-pill"><span class="label">Purity</span><span class="value">&gt;98% HPLC</span></div>
+        <div class="meta-pill"><span class="label">Sequence</span><span class="value">7 Amino Acids</span></div>
+        <div class="meta-pill"><span class="label">Storage</span><span class="value">2–8°C</span></div>
+      </div>
+      <div class="card-benefits">
+        <div class="benefit-item"><span class="benefit-dot dot-green"></span>BDNF & NGF upregulation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-blue"></span>Neuroprotective (no HPA axis impact)</div>
+        <div class="benefit-item"><span class="benefit-dot dot-teal"></span>Serotonergic & dopaminergic modulation</div>
+        <div class="benefit-item"><span class="benefit-dot dot-amber"></span>30+ years of clinical research</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="disclaimer-bar">
+  For research and educational purposes only — not for human consumption. All products require reconstitution. Certificates of analysis available on request.
+</div>
+
+</body>
+</html>
